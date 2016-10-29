@@ -1,0 +1,14 @@
+version: "2"
+
+services:
+  interactive:
+    image: node:7
+    volumes:
+        - ./:/usr/src/app
+    links:
+      - mongo:mongo
+    working_dir: /usr/src/app
+    command: bash
+
+  mongo:
+    image: mongo:3.2
