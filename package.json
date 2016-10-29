@@ -1,0 +1,19 @@
+{
+  "name": "mongo-servable",
+  "version": "0.1.0",
+  "description": "Observable interface for MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrjackdavis/mongo-servable.git"
+  },
+  "author": "Jack Davis",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mrjackdavis/mongo-servable/issues"
+  },
+  "homepage": "https://github.com/mrjackdavis/mongo-servable#readme"
+}
