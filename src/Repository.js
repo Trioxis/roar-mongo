@@ -5,6 +5,14 @@ type RepoIn<TIn,TOut> = (obj:TIn)=>TOut;
 type RepoOut<TIn,TOut> = (obj:TOut)=>TIn;
 type ConnectFn = (url:string)=>()=>Promise<Object>;
 
+import {
+  Connect as MongoConnect,
+  Dispose as MongoDispose
+} from './MongoConnect';
+
+export {MongoConnect};
+export {MongoDispose};
+
 export const cursorToObservable = (cursor)=>{
   const stream = cursor.stream();
   let obs = Observable.create(observer=>{

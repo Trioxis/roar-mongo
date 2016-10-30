@@ -23,8 +23,9 @@ In the below example, we have a collection `authors`. In our application code, w
 ```js
 import {
   MappedRepository,
-  ConnectMongo
+  MongoConnect
 } from 'mongo-servable';
+import { Observable } from 'rxjs/Rx';
 
 const InboundMap = (input:Object)=>({
   ...input,
@@ -38,7 +39,7 @@ const OutboundMap = (input:Object)=>({
 const myRepo =
 MappedRepository(
   'authors',
-  ()=>ConnectMongo(MONGO_URL),
+  ()=>MongoConnect(MONGO_URL),
   InboundMap,
   OutboundMap
 );

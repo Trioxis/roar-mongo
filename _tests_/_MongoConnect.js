@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import {
-  connect as superConnect,
-  dispose as superDispose
+  Connect as superConnect,
+  Dispose as superDispose
 } from '../src/MongoConnect';
 
 let currentConnection;

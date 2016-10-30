@@ -16,7 +16,7 @@ import { Observable } from 'rxjs/Rx';
 
 const MONGO_URL = 'mongodb://mongo:27017/integration_tests';
 
-describe.only('CRUD Repositories',()=>{
+describe('CRUD Repositories',()=>{
   let sandbox,mocks,testRepo;
   beforeEach(() => {
     sandbox = sinon.sandbox.create();
