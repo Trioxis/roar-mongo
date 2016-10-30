@@ -2,7 +2,7 @@
   "name": "mongo-servable",
   "version": "0.1.0",
   "description": "Observable interface for MongoDB",
-  "main": "index.js",
+  "main": "src/Repository.js",
   "scripts": {
     "test": "mocha ./_tests_/**/*.js --compilers js:babel-register",
     "test:watch":"nodemon --exec npm test"
