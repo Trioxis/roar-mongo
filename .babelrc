@@ -1,0 +1,9 @@
+{
+  "presets": ["es2017-node7"],
+  "plugins": [
+    "syntax-flow",
+    "syntax-async-functions",
+    "transform-flow-strip-types",
+    "transform-async-to-generator"
+  ],
+}

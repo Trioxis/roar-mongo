@@ -4,7 +4,8 @@
   "description": "Observable interface for MongoDB",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha ./_tests_/**/*.js --compilers js:babel-register",
+    "test:watch":"nodemon --exec npm test"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,21 @@
   "bugs": {
     "url": "https://github.com/mrjackdavis/mongo-servable/issues"
   },
-  "homepage": "https://github.com/mrjackdavis/mongo-servable#readme"
+  "homepage": "https://github.com/mrjackdavis/mongo-servable#readme",
+  "dependencies": {
+    "mocha": "^3.1.2",
+    "mongodb": "^2.2.11",
+    "rxjs": "^5.0.0-rc.1",
+    "sinon": "^1.17.6"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-syntax-flow": "^6.18.0",
+    "babel-plugin-transform-async-to-generator": "^6.16.0",
+    "babel-plugin-transform-flow-strip-types": "^6.18.0",
+    "babel-preset-es2017-node7": "^0.4.1",
+    "babel-register": "^6.18.0",
+    "nodemon": "^1.11.0"
+  }
 }
