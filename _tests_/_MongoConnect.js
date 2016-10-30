@@ -1,31 +1,28 @@
-import {MongoClient} from 'mongodb';
-
 import crypto from 'crypto';
+import {
+  connect as superConnect,
+  dispose as superDispose
+} from '../src/MongoConnect';
 
 let currentConnection;
 
 export async function connect (mongoUrl) {
-  if (!currentConnection) {
-    currentConnection = await newConnection(mongoUrl);
-  }
-  return currentConnection;
+  let random = await GenerateRandomString();
+  return superConnect(mongoUrl+random);
 }
 
-function newConnection(mongoUrl) {
+function GenerateRandomString(mongoUrl) {
   return new Promise((resolve, reject) => {
     crypto.randomBytes(12, function(error, buf) {
-      MongoClient.connect(mongoUrl + buf.toString('hex'), (err, db) => {
-        if (err) {
+        if (error) {
           reject(err);
         } else {
-          resolve(db);
+          resolve(buf.toString('hex'));
         }
-      });
     });
   });
 }
 
 export async function dispose () {
-  const db = await connect();
-  await db.dropDatabase();
+  return await superDispose();
 }

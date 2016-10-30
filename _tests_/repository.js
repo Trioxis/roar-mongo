@@ -7,6 +7,11 @@ import {
   dispose as disposeMongo
 } from './_MongoConnect';
 
+import {
+  CRUDRepository,
+  MappedRepository
+} from '../src/Repository';
+
 import { Observable } from 'rxjs/Rx';
 
 const MONGO_URL = 'mongodb://mongo:27017/integration_tests'
@@ -24,7 +29,7 @@ describe.only('Mongo Repositories',()=>{
   describe('BasicRepository',()=>{
     let testRepo;
     beforeEach(() => {
-      testRepo = BasicRepository('tests');
+      testRepo = CRUDRepository('tests',()=>connectMongo(MONGO_URL));
     });
     describe('insert', () => {
       it('should insert items into mongodb collection');
@@ -140,7 +145,7 @@ describe.only('Mongo Repositories',()=>{
       // Map converts "id" and "foo" fields to store with underscore
       let inMap = (item)=>({_id:item.id, _foo:item.foo});
       let outMap = (item)=>({id:item._id,foo:item._foo});
-      testRepo = MappedRepository('test', inMap, outMap);
+      testRepo = MappedRepository('test',()=>connectMongo(MONGO_URL), inMap, outMap);
     });
     describe('insert',()=>{
       it('should use inMap for arguements and outMap for result',async ()=>{
@@ -184,112 +189,4 @@ describe.only('Mongo Repositories',()=>{
       })
     })
   });
-});
-
-type RepoIn<TIn,TOut> = (obj:TIn)=>TOut;
-type RepoOut<TIn,TOut> = (obj:TOut)=>TIn;
-
-const cursorToObservable = (cursor)=>{
-  const stream = cursor.stream();
-  let obs = Observable.create(observer=>{
-    stream
-    .on('close',()=>observer.complete())
-    .on('error',err=>observer.error(err))
-    .on('data',data=>observer.next(data));
-  })
-
-  obs.debounceTime(20)
-  .subscribe(async()=>{
-    let hasNext = await cursor.hasNext();
-    if(!hasNext){
-      cursor.close();
-    }
-  });
-
-  return obs;
-}
-
-const Query = getColumn=>
-(params:Object = {},cursor:Object = { take:100 }):Observable=>
-  Observable
-  .fromPromise(getColumn())
-  .map(col=>col.find(params).limit(cursor.take))
-  .flatMap(cursorToObservable);
-
-const Insert = getColumn=>
-(input:Observable):Observable=>Observable
-  .fromPromise(getColumn())
-  .mergeMap(col=>input
-    // Buffer into batches of 1 thousand to avoid freaking mongo out
-    .bufferCount(1000)
-    // Insert the docs
-    .flatMap(items=>{
-      return col.insertMany(items)
-    })
-    .retry(5)
-    // Flatten the batches back out into an observable
-    .flatMap(res=>Observable.from(res.ops))
-  );
-
-const Update = getColumn=>
-(input:Observable):Observable=>Observable
-  .fromPromise(getColumn())
-  .mergeMap(col=>input
-    .flatMap(item=>col
-      .findOneAndReplace({_id:item._id},item)
-    )
-    .map(res=>res.value._id)
-  );
-
-const Delete = getColumn=>
-(input:Observable):Observable=>Observable
-  .fromPromise(getColumn())
-  .mergeMap(col=>input
-    .flatMap(item=>col
-      .findOneAndDelete({_id:item._id})
-    )
-    .map(res=>res.value._id)
-  );
-
-const GetColumn = (collectionName)=>async()=>{
-  let db = await connectMongo(MONGO_URL);
-  let col = db.collection(collectionName);
-  return col;
-};
-
-const HandleArrayArgument = (insertFn)=>(input:Array<Object>|Observable)=>{
-  if(input instanceof Observable){
-    return insertFn(input);
-  }else{
-    return insertFn(Observable.from(input));
-  }
-}
-
-const MapObservableArgument = (mapFn,decoratedFn)=>
-(input:Observable)=>
-  decoratedFn(input.map(mapFn));
-
-const MapObservableResult = (mapFn,decoratedFn)=>
-(...args)=>decoratedFn(...args).map(mapFn);
-
-const BasicRepository = (columnName:string)=>({
-  query:Query(GetColumn(columnName)),
-  insert:HandleArrayArgument(
-    Insert(GetColumn(columnName))),
-  update:Update(GetColumn(columnName)),
-  delete:Delete(GetColumn(columnName))
-})
-
-const MappedRepository = (columnName:string,inMap,outMap)=>({
-  query:MapObservableResult(outMap,
-    Query(GetColumn(columnName))),
-  insert:HandleArrayArgument(
-    MapObservableArgument(inMap,
-      MapObservableResult(outMap,
-        Insert(GetColumn(columnName))))),
-  update:HandleArrayArgument(
-    Update(GetColumn(columnName))),
-  delete:
-  HandleArrayArgument(
-    Delete(GetColumn(columnName)))
 });
