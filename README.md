@@ -1,5 +1,7 @@
 # Mongo-servable
 
+**PRE-ALPHA. BREAKING CHANGES LIKELY**
+
 An functional reactive interface for MongoDb, based on Observables.
 
 The goal is to
@@ -126,6 +128,56 @@ await myRepo.update(updateItems).toPromise();
 
 // Profit.
 ```
+
+### Roll your own repository
+
+You can easily build your own repository too. Take the following for example.
+This repository has `Add` and `GetByName`. Both of which are composed from higher
+order functions exposed by this library.
+
+```js
+import {
+  Query,
+  Insert,
+  ConnectMongo,
+  GetCollection
+} from 'mongo-servable';
+
+const MONGO_URL = ...;
+
+const GetCollectionFn = ()=>GetCollection('myItems',ConnectMongo(MONGO_URL)));
+const OutMap = item=>({
+  id:item._id.toString(),
+  name:item.name
+});
+const InMap = ({name})=>({
+  name
+});
+
+class MyRepo {
+  constructor(){
+    this.GetCollectionFn = ()=>GetCollection('myItems',ConnectMongo(MONGO_URL)));
+  }
+  GetByName(name){
+    const mongoQuery = { name }
+    return MapObservableResult(OutMap,
+      Query(
+        GetCollectionFn()
+      )
+    )(mongoQuery)
+  }
+  Add(arrayOfNames){
+    return HandleArrayArgument(
+      MapObservableArgument(InMap,
+        MapObservableResult(OutMap,
+          Insert(GetCollectionFn())
+        )
+      )
+    )(arrayOfNames)
+  }
+}
+```
+
 
 ## API
 ### `CRUDRepository`
