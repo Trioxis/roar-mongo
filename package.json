@@ -1,5 +1,5 @@
 {
-  "name": "mongo-servable",
+  "name": "roar-mongo",
   "version": "0.1.0",
   "description": "Observable interface for MongoDB",
   "main": "src/Repository.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mrjackdavis/mongo-servable.git"
+    "url": "git+https://github.com/mrjackdavis/roar-mongo.git"
   },
   "author": "Jack Davis",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mrjackdavis/mongo-servable/issues"
+    "url": "https://github.com/mrjackdavis/roar-mongo/issues"
   },
-  "homepage": "https://github.com/mrjackdavis/mongo-servable#readme",
+  "homepage": "https://github.com/mrjackdavis/roar-mongo#readme",
   "dependencies": {
     "mocha": "^3.1.2",
     "mongodb": "^2.2.11",

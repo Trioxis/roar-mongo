@@ -1,14 +1,12 @@
-# Mongo-servable
+# Roar Mongo
 
 **PRE-ALPHA. BREAKING CHANGES LIKELY**
 
-An functional reactive interface for MongoDb, based on Observables.
-
-The goal is to
+A functional reactive interface for MongoDb, based on Observables.
 
 - Composable
-- Reactive Functional; via `Observable`s
-- Unopinionated; batteries included
+- Reactive
+- Batteries removable, but included
 
 ## Usage
 
@@ -20,21 +18,29 @@ To get up and running quickly, you can use `CRUDRepository` and `MappedRepositor
 
 `MappedRepository` is effectively a `CRUDRepository`, with the addition of input and output mapping. At Trioxis, we use this as an ORM.
 
-In the below example, we have a collection `authors`. In our application code, we prefer referring to `author.id` instead of `author._id`. We'd also prefer the ID field to be a string instead of a BSON `ObjectID`.
+In the below example, we want to validate the stored object, as well as maintain a slightly different api
+
+This can be useful when using a library like [Joi](https://github.com/hapijs/joi) for validation.
 
 ```js
 import {
   MappedRepository,
   MongoConnect
-} from 'mongo-servable';
+} from 'roar-mongo';
 import { Observable } from 'rxjs/Rx';
+import assert from 'assert';
 
-const InboundMap = (input:Object)=>({
-  ...input,
-  _id:new ObjectID(input.id)
-})
+const InboundMap = (input:Object)=>{
+  assert.ok(input.name,'Author should contain name');
+  const _id = input.id ? new ObjectID(input.id) : new ObjectID()
+
+  return {
+    name:input.name,
+    _id
+  };
+}
 const OutboundMap = (input:Object)=>({
-  ...input,
+  name:input.name,
   id:input._id.toString()
 })
 
@@ -94,7 +100,7 @@ Lets say you want to migrate something...
 import {
   CRUDRepository,
   ConnectMongo
-} from 'mongo-servable';
+} from 'roar-mongo';
 
 const myRepo =
 CRUDRepository(
@@ -139,9 +145,12 @@ order functions exposed by this library.
 import {
   Query,
   Insert,
+  HandleArrayArgument,
+  MapObservableArgument,
+  MapObservableResult,
   ConnectMongo,
   GetCollection
-} from 'mongo-servable';
+} from 'roar-mongo';
 
 const MONGO_URL = ...;
 
@@ -155,9 +164,6 @@ const InMap = ({name})=>({
 });
 
 class MyRepo {
-  constructor(){
-    this.GetCollectionFn = ()=>GetCollection('myItems',ConnectMongo(MONGO_URL)));
-  }
   GetByName(name){
     const mongoQuery = { name }
     return MapObservableResult(OutMap,
@@ -187,7 +193,7 @@ class MyRepo {
 import {
   CRUDRepository,
   ConnectMongo
-} from 'mongo-servable';
+} from 'roar-mongo';
 
 const myRepo =
 CRUDRepository('tests',()=>ConnectMongo(MONGO_URL));
@@ -197,7 +203,7 @@ CRUDRepository('tests',()=>ConnectMongo(MONGO_URL));
 
 ```js
 let insertedObjects = await myRepo
-.insert(Observable.of({a:'b'},{a:'b'}])
+.insert(Observable.of([{a:'b'},{a:'b'}]))
 .toArray()
 .toPromise();
 
@@ -210,7 +216,7 @@ let insertedObjects = await myRepo
 #### `query`
 
 ```js
-import { CRUDRepository } from 'mongo-servable';
+import { CRUDRepository } from 'roar-mongo';
 
 await myRepo
 .query({})
