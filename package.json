@@ -1,11 +1,12 @@
 {
   "name": "roar-mongo",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Observable interface for MongoDB",
-  "main": "src/Repository.js",
+  "main": "dist/Repository.js",
   "scripts": {
     "test": "mocha ./_tests_/**/*.js --compilers js:babel-register",
-    "test:watch":"nodemon --exec npm test"
+    "test:watch":"nodemon --exec npm test",
+    "prepublish":"babel src --out-dir dist"
   },
   "repository": {
     "type": "git",
@@ -18,12 +19,12 @@
   },
   "homepage": "https://github.com/mrjackdavis/roar-mongo#readme",
   "dependencies": {
-    "mocha": "^3.1.2",
     "mongodb": "^2.2.11",
-    "rxjs": "^5.0.0-rc.1",
-    "sinon": "^1.17.6"
+    "rxjs": "^5.0.0-rc.1"
   },
   "devDependencies": {
+    "mocha": "^3.1.2",
+    "sinon": "^1.17.6",
     "babel-cli": "^6.18.0",
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-plugin-syntax-flow": "^6.18.0",
