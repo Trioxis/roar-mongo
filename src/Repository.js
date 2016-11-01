@@ -1,4 +1,5 @@
 // @flow
+import "babel-polyfill";
 import { Observable } from 'rxjs/Rx';
 
 type RepoIn<TIn,TOut> = (obj:TIn)=>TOut;

@@ -1,9 +1,23 @@
 {
-  "presets": ["es2017-node7"],
-  "plugins": [
-    "syntax-flow",
-    "syntax-async-functions",
-    "transform-flow-strip-types",
-    "transform-async-to-generator"
-  ],
+  "env": {
+    "development":{
+      "presets": ["es2017-node7"],
+      "plugins": [
+        "syntax-flow",
+        "syntax-async-functions",
+        "transform-flow-strip-types",
+        "transform-async-to-generator"
+      ],
+    },
+    "production": {
+      "presets": ["es2017","es2015"],
+      "plugins": [
+        "syntax-flow",
+        "syntax-async-functions",
+        "transform-object-rest-spread",
+        "transform-flow-strip-types",
+        "transform-async-to-generator"
+      ]
+    }
+  }
 }
