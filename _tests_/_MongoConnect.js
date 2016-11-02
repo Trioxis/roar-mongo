@@ -4,8 +4,6 @@ import {
   Dispose as superDispose
 } from '../src/MongoConnect';
 
-let currentConnection;
-
 export async function connect (mongoUrl) {
   let random = await GenerateRandomString();
   return superConnect(mongoUrl+random);
@@ -23,6 +21,6 @@ function GenerateRandomString(mongoUrl) {
   });
 }
 
-export async function dispose () {
-  return await superDispose();
+export async function dispose (url) {
+  (await connect(url)).dropDatabase();
 }

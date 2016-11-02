@@ -1,5 +1,4 @@
 // @flow
-import sinon from 'sinon';
 import assert from 'assert';
 import {ObjectID,MongoClient} from 'mongodb';
 import {
@@ -17,19 +16,15 @@ import { Observable } from 'rxjs/Rx';
 const MONGO_URL = 'mongodb://mongo:27017/integration_tests'
 
 describe('MappedRepository',()=>{
-  let sandbox,mocks,testRepo;
+  let testRepo;
   beforeEach(() => {
-    sandbox = sinon.sandbox.create();
-    mocks = {};
-
     // Map converts "id" and "foo" fields to store with underscore
     let inMap = (item)=>({_id:item.id, _foo:item.foo});
     let outMap = (item)=>({id:item._id,foo:item._foo});
     testRepo = MappedRepository('test',()=>connectMongo(MONGO_URL), inMap, outMap);
   });
   afterEach(() => {
-    sandbox.restore();
-    return disposeMongo();
+    return disposeMongo(MONGO_URL);
   });
   describe('insert',()=>{
     it('should use inMap for arguements and outMap for result',async ()=>{

@@ -24,8 +24,7 @@ describe('CRUD Repositories',()=>{
     testRepo = CRUDRepository('tests',()=>connectMongo(MONGO_URL));
   });
   afterEach(() => {
-    sandbox.restore();
-    return disposeMongo();
+    return disposeMongo(MONGO_URL);
   });
   describe('insert', () => {
     it('should insert items into mongodb collection');

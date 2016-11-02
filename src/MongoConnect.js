@@ -19,6 +19,6 @@ async function newConnection(url) {
 
 export async function Dispose (url) {
   if(currentConnection){
-    await currentConnection.dropDatabase();
+    await currentConnection.close();
   }
 }
