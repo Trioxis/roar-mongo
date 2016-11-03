@@ -72,19 +72,25 @@ describe('CRUD Repositories',()=>{
   describe('query', () => {
     it('should return added items',async ()=>{
       let itemFactory = Observable
-        .range(1, 50)
-        .map(i=>({foo:5}));
+        .range(0, 100)
+        .map(i=>({
+          even:(i%2 === 0),
+          foo:i
+        }));
 
       await testRepo
       .insert(itemFactory)
       .toPromise();
 
-      let res = await testRepo.query({})
+      let res = await testRepo.query({
+        foo:{$gte:20},
+        even:true
+      })
       .do(item=>assert.ok(item.foo,'Each item should contain "foo" key'))
       .toArray()
       .toPromise();
 
-      assert.equal(res.length, 50,'Should return all results');
+      assert.equal(res.length, 40,'Should return all results');
     });
   });
   describe('update',()=>{
