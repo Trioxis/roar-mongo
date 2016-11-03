@@ -1,6 +1,6 @@
 {
   "name": "roar-mongo",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Observable interface for MongoDB",
   "main": "dist/Repository.js",
   "scripts": {
