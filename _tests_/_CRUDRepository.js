@@ -27,7 +27,6 @@ describe('CRUD Repositories',()=>{
     return disposeMongo(MONGO_URL);
   });
   describe('insert', () => {
-    it('should insert items into mongodb collection');
     it('should accept and array and return observable of inserted items',async ()=>{
       let res = await testRepo
       .insert([{a:'b'},{a:'b'}])
@@ -47,7 +46,6 @@ describe('CRUD Repositories',()=>{
 
       assert.equal(res.length, 10, 'All items should be returned');
     });
-    it('should also accept an object');
     it('should deal with enormous amounts of data',async function(){
       this.timeout(10000);
 
@@ -61,7 +59,7 @@ describe('CRUD Repositories',()=>{
       .insert(itemFactory)
       .toPromise();
 
-      let res = await testRepo.query({},{take:hugeness})
+      let res = await testRepo.query({})
       // Accumulate count
       .reduce((acc, item) => acc + 1, 0)
       .toPromise();
@@ -91,6 +89,44 @@ describe('CRUD Repositories',()=>{
       .toPromise();
 
       assert.equal(res.length, 40,'Should return all results');
+    });
+    it('should handle multiple simultaneous queries',async ()=>{
+      const numberOfItems = 1000;
+      let itemFactory = Observable
+        .range(0, numberOfItems)
+        .map(i=>({
+          even:(i%2===0),
+        }));
+
+      await testRepo
+      .insert(itemFactory)
+      .toPromise();
+
+      const numberOfQueries = 100;
+
+      const res = await Observable
+      .range(0, numberOfQueries)
+      .mapTo({})
+      .flatMap(query=>testRepo.query(query))
+      .toArray()
+      .toPromise();
+
+      assert.equal(res.length, numberOfQueries*numberOfItems,'Should return all results');
+    });
+    it('should handle result limit',async ()=>{
+      let itemFactory = Observable
+        .range(0, 1000)
+        .map(i=>({foo:'bar'}));
+
+      await testRepo
+      .insert(itemFactory)
+      .toPromise();
+
+      let res = await testRepo.query({},{limit:100})
+      .toArray()
+      .toPromise();
+
+      assert.equal(res.length, 100,'Should return all results');
     });
   });
   describe('update',()=>{
