@@ -15,30 +15,25 @@ export {MongoConnect};
 export {MongoDispose};
 
 export const cursorToObservable = (cursor)=>{
-  const stream = cursor.stream();
-  let obs = Observable.create(observer=>{
-    stream
-    .on('close',()=>observer.complete())
-    .on('error',err=>observer.error(err))
-    .on('data',data=>observer.next(data));
-  })
-
-  obs.debounceTime(20)
-  .subscribe(async()=>{
-    let hasNext = await cursor.hasNext();
-    if(!hasNext){
-      cursor.close();
-    }
-  });
-
-  return obs;
+  return Observable.create(observer=>cursor
+    .once('end',()=>observer.complete())
+    .once('error',err=>observer.error(err))
+    .on('data',data=>observer.next(data))
+  );
 }
 
 export const Query = getColumn=>
-(params:Object = {},cursor:Object = { take:100 }):Observable=>
+(params:Object = {},cursor:Object = { }):Observable=>
   Observable
   .fromPromise(getColumn())
-  .map(col=>col.find(params).limit(cursor.take))
+  .map(col=>col.find(params))
+  .map(queryCursor=>{
+    if(cursor.limit != null){
+      return queryCursor.limit(cursor.limit);
+    }else {
+      return queryCursor;
+    }
+  })
   .flatMap(cursorToObservable);
 
 export const Insert = getColumn=>
