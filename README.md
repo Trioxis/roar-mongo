@@ -248,7 +248,9 @@ await myRepo
 #### `update`
 
 ```js
-let objectsToUpdate = insertedObjects.map(o=>o.a = 'c');
+// Objects are updated using their `_id`
+// Argument to .update() must be Observables
+let objectsToUpdate = insertedObjects.map(o => Observable.of({...o, newField: 'c'}));
 
 await myRepo
 .update(objectsToUpdate)
