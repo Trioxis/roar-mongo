@@ -105,9 +105,7 @@ import {
 const myRepo =
 CRUDRepository(
   'stuff',
-  ()=>ConnectMongo(MONGO_URL),
-  InboundMap,
-  OutboundMap
+  ()=>ConnectMongo(MONGO_URL)
 );
 
 // Lets say... you've got all this stuff...
