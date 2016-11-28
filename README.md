@@ -99,13 +99,13 @@ Lets say you want to migrate something...
 ```js
 import {
   CRUDRepository,
-  ConnectMongo
+  MongoConnect
 } from 'roar-mongo';
 
 const myRepo =
 CRUDRepository(
   'stuff',
-  ()=>ConnectMongo(MONGO_URL)
+  ()=>MongoConnect(MONGO_URL)
 );
 
 // Lets say... you've got all this stuff...
@@ -146,13 +146,13 @@ import {
   HandleArrayArgument,
   MapObservableArgument,
   MapObservableResult,
-  ConnectMongo,
+  MongoConnect,
   GetCollection
 } from 'roar-mongo';
 
 const MONGO_URL = ...;
 
-const GetCollectionFn = ()=>GetCollection('myItems',ConnectMongo(MONGO_URL)));
+const GetCollectionFn = ()=>GetCollection('myItems',MongoConnect(MONGO_URL)));
 const OutMap = item=>({
   id:item._id.toString(),
   name:item.name
@@ -190,11 +190,11 @@ class MyRepo {
 ```js
 import {
   CRUDRepository,
-  ConnectMongo
+  MongoConnect
 } from 'roar-mongo';
 
 const myRepo =
-CRUDRepository('tests',()=>ConnectMongo(MONGO_URL));
+CRUDRepository('tests',()=>MongoConnect(MONGO_URL));
 ```
 
 #### `insert`
