@@ -25,7 +25,8 @@ This can be useful when using a library like [Joi](https://github.com/hapijs/joi
 ```js
 import {
   MappedRepository,
-  MongoConnect
+  MongoConnect,
+  MongoDispose
 } from 'roar-mongo';
 import { Observable } from 'rxjs/Rx';
 import assert from 'assert';
@@ -60,10 +61,17 @@ const items = [
   }
 ]
 
-let res = await myRepo.insert(items)
-// Returns an Observable of items
-.toArray()
-.toPromise();
+const main = async () => {
+  let res = await myRepo.insert(items)
+  // Returns an Observable of items
+  .toArray()
+  .toPromise();
+
+  // Close the connection to allow the program to exit
+  await MongoDispose(MONGO_URL);
+}
+
+main();
 
 // Stored in Mongo:
 // [
@@ -99,7 +107,8 @@ Lets say you want to migrate something...
 ```js
 import {
   CRUDRepository,
-  MongoConnect
+  MongoConnect,
+  MongoDispose
 } from 'roar-mongo';
 
 const myRepo =
@@ -126,11 +135,16 @@ const updateItems = myRepo
   foo:(item.foo*10)
 }));
 
-// ... and perform the update
-// Each item will be streamed in via the observable and sanely updated
-await myRepo.update(updateItems).toPromise();
+const main = async () => {
+  // ... and perform the update
+  // Each item will be streamed in via the observable and sanely updated
+  await myRepo.update(updateItems).toPromise();
 
-// Profit.
+  // Profit. Then close
+  await MongoDispose(MONGO_URL);
+}
+
+main();
 ```
 
 ### Roll your own repository
@@ -190,11 +204,15 @@ class MyRepo {
 ```js
 import {
   CRUDRepository,
-  MongoConnect
+  MongoConnect,
+  MongoDispose
 } from 'roar-mongo';
 
 const myRepo =
 CRUDRepository('tests',()=>MongoConnect(MONGO_URL));
+
+// When you are done, dispose the connection
+MongoDispose(MONGO_URL);
 ```
 
 #### `insert`
