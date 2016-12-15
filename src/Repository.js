@@ -108,8 +108,10 @@ export const MappedRepository = (columnName:string,connectFn:ConnectFn,inMap:Rep
       MapObservableResult(outMap,
         Insert(GetCollection(columnName,connectFn))))),
   update:HandleArrayArgument(
-    Update(GetCollection(columnName,connectFn))),
+    MapObservableArgument(inMap,
+      Update(GetCollection(columnName,connectFn)))),
   delete:
   HandleArrayArgument(
-    Delete(GetCollection(columnName,connectFn)))
+    MapObservableArgument(inMap,
+      Delete(GetCollection(columnName,connectFn))))
 });
