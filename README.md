@@ -25,7 +25,8 @@ This can be useful when using a library like [Joi](https://github.com/hapijs/joi
 ```js
 import {
   MappedRepository,
-  MongoConnect
+  MongoConnect,
+  MongoDispose
 } from 'roar-mongo';
 import { Observable } from 'rxjs/Rx';
 import assert from 'assert';
@@ -60,10 +61,17 @@ const items = [
   }
 ]
 
-let res = await myRepo.insert(items)
-// Returns an Observable of items
-.toArray()
-.toPromise();
+const main = async () => {
+  let res = await myRepo.insert(items)
+  // Returns an Observable of items
+  .toArray()
+  .toPromise();
+
+  // Close the connection to allow the program to exit
+  await MongoDispose(MONGO_URL);
+}
+
+main();
 
 // Stored in Mongo:
 // [
@@ -99,15 +107,14 @@ Lets say you want to migrate something...
 ```js
 import {
   CRUDRepository,
-  ConnectMongo
+  MongoConnect,
+  MongoDispose
 } from 'roar-mongo';
 
 const myRepo =
 CRUDRepository(
   'stuff',
-  ()=>ConnectMongo(MONGO_URL),
-  InboundMap,
-  OutboundMap
+  ()=>MongoConnect(MONGO_URL)
 );
 
 // Lets say... you've got all this stuff...
@@ -128,11 +135,16 @@ const updateItems = myRepo
   foo:(item.foo*10)
 }));
 
-// ... and perform the update
-// Each item will be streamed in via the observable and sanely updated
-await myRepo.update(updateItems).toPromise();
+const main = async () => {
+  // ... and perform the update
+  // Each item will be streamed in via the observable and sanely updated
+  await myRepo.update(updateItems).toPromise();
 
-// Profit.
+  // Profit. Then close
+  await MongoDispose(MONGO_URL);
+}
+
+main();
 ```
 
 ### Roll your own repository
@@ -148,13 +160,13 @@ import {
   HandleArrayArgument,
   MapObservableArgument,
   MapObservableResult,
-  ConnectMongo,
+  MongoConnect,
   GetCollection
 } from 'roar-mongo';
 
 const MONGO_URL = ...;
 
-const GetCollectionFn = ()=>GetCollection('myItems',ConnectMongo(MONGO_URL)));
+const GetCollectionFn = ()=>GetCollection('myItems',MongoConnect(MONGO_URL)));
 const OutMap = item=>({
   id:item._id.toString(),
   name:item.name
@@ -192,11 +204,15 @@ class MyRepo {
 ```js
 import {
   CRUDRepository,
-  ConnectMongo
+  MongoConnect,
+  MongoDispose
 } from 'roar-mongo';
 
 const myRepo =
-CRUDRepository('tests',()=>ConnectMongo(MONGO_URL));
+CRUDRepository('tests',()=>MongoConnect(MONGO_URL));
+
+// When you are done, dispose the connection
+MongoDispose(MONGO_URL);
 ```
 
 #### `insert`
@@ -232,7 +248,9 @@ await myRepo
 #### `update`
 
 ```js
-let objectsToUpdate = insertedObjects.map(o=>o.a = 'c');
+// Objects are updated using their `_id`
+// Argument to .update() must be Observables
+let objectsToUpdate = insertedObjects.map(o => Observable.of({...o, newField: 'c'}));
 
 await myRepo
 .update(objectsToUpdate)
