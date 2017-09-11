@@ -1,6 +1,10 @@
 version: "2"
 
 services:
+  test:
+    build: .
+    links:
+      - mongo:mongo
   interactive:
     image: node:7
     volumes:
