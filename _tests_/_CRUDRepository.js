@@ -153,8 +153,9 @@ describe('CRUD Repositories',()=>{
 
       assert.equal(res.length, 50,'Should return all results');
     })
-
-    it('should upsert items if the option is specified', async () => {
+  });
+  describe('upsert',()=>{
+    it('should upsert items and return corrosponding ids', async () => {
       let itemFactory = Observable
       .range(1, 50)
       .map(i => ({aNumber: 5}));
@@ -169,7 +170,7 @@ describe('CRUD Repositories',()=>{
       );
 
       let res = await testRepo
-      .update(newItems, {upsert: true})
+      .upsert(newItems)
       .do(id => assert.ok(id, 'Should return ids'))
       .toArray()
       .flatMap(ids => testRepo.query({_id: {$in: ids}}))
