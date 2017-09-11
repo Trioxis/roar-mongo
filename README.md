@@ -259,11 +259,15 @@ await myRepo
 
 // [ 58154e18d52c140979028144, 58154e18d52c140979028145 ]
 
-// Upsert is supported
+```
+
+#### `upsert`
+```js
+// Upsert is supported as its own method
 let moreToUpdate = objectsToUpdate.merge(Observable.of({...o, newField: 'c'}));
 
 await myRepo
-.update(moreToUpdate, {upsert: true})
+.upsert(moreToUpdate)
 .toArray()
 .toPromise();
 
