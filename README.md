@@ -258,6 +258,17 @@ await myRepo
 .toPromise();
 
 // [ 58154e18d52c140979028144, 58154e18d52c140979028145 ]
+
+// Upsert is supported
+let moreToUpdate = objectsToUpdate.merge(Observable.of({...o, newField: 'c'}));
+
+await myRepo
+.update(moreToUpdate, {upsert: true})
+.toArray()
+.toPromise();
+
+// [ 58154e18d52c140979028144, 58154e18d52c140979028145, 59b5e02023a61300d983146c ]
+
 ```
 
 #### `delete`
