@@ -1,0 +1,23 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/cci-demo-docker-primary:0.0.2
+    steps:
+      - checkout
+      - run:
+          name: Install Docker Compose
+          command: |
+            set -x
+            curl -L https://github.com/docker/compose/releases/download/1.11.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
+      - setup_remote_docker
+      - run:
+          name: Pull docker service images
+          command: docker-compose pull
+      - run:
+          name: Build docker service images
+          command: docker-compose build
+      - run:
+          name: Run tests in docker
+          command: docker-compose run test

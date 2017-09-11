@@ -154,6 +154,33 @@ describe('CRUD Repositories',()=>{
       assert.equal(res.length, 50,'Should return all results');
     })
   });
+  describe('upsert',()=>{
+    it('should upsert items and return corrosponding ids', async () => {
+      let itemFactory = Observable
+      .range(1, 50)
+      .map(i => ({aNumber: 5}));
+
+      let insertedObs = testRepo
+      .insert(itemFactory)
+      .do(item => assert.equal(item.aNumber, 5, 'Field value should be that of inserted value'));
+
+      let newItems = Observable.merge(
+        insertedObs.map(item => ({...item, aNumber: 6})),
+        Observable.range(1, 10).map(_ => ({_id: ObjectID(), aNumber: 6}))
+      );
+
+      let res = await testRepo
+      .upsert(newItems)
+      .do(id => assert.ok(id, 'Should return ids'))
+      .toArray()
+      .flatMap(ids => testRepo.query({_id: {$in: ids}}))
+      .do(item => assert.equal(item.aNumber, 6, 'Documents should have been updated'))
+      .toArray()
+      .toPromise();
+
+      assert.equal(res.length, 60, 'Should return all results');
+    })
+  });
   describe('delete',()=>{
     it('should delete items accordingly and return corrosponding ids',async()=>{
       let itemFactory = Observable
