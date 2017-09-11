@@ -13,5 +13,11 @@ jobs:
             chmod +x /usr/local/bin/docker-compose
       - setup_remote_docker
       - run:
+          name: Pull docker service images
+          command: docker-compose pull
+      - run:
+          name: Build docker service images
+          command: docker-compose build
+      - run:
           name: Run tests in docker
           command: docker-compose run test
