@@ -51,15 +51,27 @@ export const Insert = getColumn=>
     .flatMap(res=>Observable.from(res.ops))
   );
 
-const updateOptions = {upsert: false}
 export const Update = getColumn =>
-  (input: Observable, options: Object = updateOptions): Observable => Observable
+  (input: Observable): Observable => Observable
     .fromPromise(getColumn())
     .mergeMap(col => input
       .flatMap(item => col
-        .findOneAndReplace({_id: item._id}, item, options)
+        .findOneAndReplace({_id: item._id}, item)
       )
-      .map(res => (res.value && res.value._id) || res.lastErrorObject.upserted)
+      .map(res => res.value._id)
+    );
+
+export const Upsert = getColumn =>
+  (input: Observable): Observable => Observable
+    .fromPromise(getColumn())
+    .mergeMap(col => input
+      .flatMap(item => col
+        .findOneAndReplace({_id: item._id}, item, {
+          upsert: true,
+          returnOriginal: false
+        })
+      )
+      .map(res => res.value._id)
     );
 
 export const Delete = getColumn=>
@@ -98,6 +110,7 @@ export const CRUDRepository = (columnName:string,connectFn:ConnectFn)=>({
   insert:HandleArrayArgument(
     Insert(GetCollection(columnName,connectFn))),
   update:Update(GetCollection(columnName,connectFn)),
+  upsert:Upsert(GetCollection(columnName,connectFn)),
   delete:Delete(GetCollection(columnName,connectFn))
 })
 
@@ -111,6 +124,9 @@ export const MappedRepository = (columnName:string,connectFn:ConnectFn,inMap:Rep
   update:HandleArrayArgument(
     MapObservableArgument(inMap,
       Update(GetCollection(columnName,connectFn)))),
+  upsert:HandleArrayArgument(
+    MapObservableArgument(inMap,
+      Upsert(GetCollection(columnName,connectFn)))),
   delete:
   HandleArrayArgument(
     MapObservableArgument(inMap,
