@@ -1,5 +1,4 @@
 // @flow
-import "babel-polyfill";
 import {MongoClient} from 'mongodb';
 
 import crypto from 'crypto';

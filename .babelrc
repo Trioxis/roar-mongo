@@ -6,7 +6,11 @@
         "syntax-flow",
         "syntax-async-functions",
         "transform-flow-strip-types",
-        "transform-async-to-generator"
+        "transform-async-to-generator",
+        ["transform-runtime", {
+          "polyfill": false,
+          "regenerator": true
+        }]
       ],
     },
     "production": {
@@ -16,7 +20,11 @@
         "syntax-async-functions",
         "transform-object-rest-spread",
         "transform-flow-strip-types",
-        "transform-async-to-generator"
+        "transform-async-to-generator",
+        ["transform-runtime", {
+          "polyfill": false,
+          "regenerator": true
+        }]
       ]
     }
   }
