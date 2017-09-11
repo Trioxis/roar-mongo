@@ -51,15 +51,16 @@ export const Insert = getColumn=>
     .flatMap(res=>Observable.from(res.ops))
   );
 
-export const Update = getColumn=>
-(input:Observable):Observable=>Observable
-  .fromPromise(getColumn())
-  .mergeMap(col=>input
-    .flatMap(item=>col
-      .findOneAndReplace({_id:item._id},item)
-    )
-    .map(res=>res.value._id)
-  );
+const updateOptions = {upsert: false}
+export const Update = getColumn =>
+  (input: Observable, options: Object = updateOptions): Observable => Observable
+    .fromPromise(getColumn())
+    .mergeMap(col => input
+      .flatMap(item => col
+        .findOneAndReplace({_id: item._id}, item, options)
+      )
+      .map(res => (res.value && res.value._id) || res.lastErrorObject.upserted)
+    );
 
 export const Delete = getColumn=>
 (input:Observable):Observable=>Observable
