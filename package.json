@@ -1,6 +1,6 @@
 {
-  "name": "roar-mongo",
-  "version": "0.1.6",
+  "name": "@trioxis/roar-mongo",
+  "version": "0.3.0-alpha+1",
   "description": "Observable interface for MongoDB",
   "main": "dist/Repository.js",
   "scripts": {
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mrjackdavis/roar-mongo.git"
+    "url": "git+https://github.com/Trioxis/roar-mongo.git"
   },
   "author": "Jack Davis",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mrjackdavis/roar-mongo/issues"
+    "url": "https://github.com/Trioxis/roar-mongo/issues"
   },
-  "homepage": "https://github.com/mrjackdavis/roar-mongo#readme",
+  "homepage": "https://github.com/Trioxis/roar-mongo#readme",
   "dependencies": {
     "babel-runtime": "^6.26.0",
     "mongodb": "^2.2.11",
